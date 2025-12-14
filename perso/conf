@@ -1,0 +1,103 @@
+#!/bin/bash
+
+########################  REQUIRED
+
+_echot "------- required files"
+file_env=${_PATH_BS}/conf/.sh_env
+file_sh_aliases=${_PATH_BS}/conf/.sh_aliases
+file_sh_functions=${_PATH_BS}/conf/.sh_functions
+file_env_perso=${_path_base}/perso/conf/.sh_env_perso
+_require ${file_env} ${file_sh_aliases} ${file_sh_functions} ${file_env_perso}
+
+_echot "------- required paths"
+pth_shared_bs=/home/shared/repo/bs
+_requirep ${pth_shared_bs}
+
+########################  SYSTEM
+
+_echot "------- iommu"
+ file=/etc/default/grub
+_askyn "Add 'iommu=soft' in GRUB_CMDLINE_LINUX variable ?"
+[ "${_ANSWER}" = y ] && sudo sed -i '/^GRUB_CMDLINE_LINUX="/ s|"$| iommu=soft"|' ${file}
+_confset _SYSNAME "${_SYSNAME}"
+
+_echot "------- create paths"
+pths="ext/backup ext/ovh ext/shared /home/shared"
+for pth in ${pths}; do
+	[ -d "${pth}" ] || _evalr mkdir -p ${pth}
+	_evalr chown ${USER}:${USER} ${pth}
+done
+
+file=/etc/fstab
+if ! grep -q "${_PATH_BS}" ${file}; then
+	_echot "------- path ${_PATH_BS}"
+	[ -d "${_PATH_BS}" ] && _evalr rm -fR "${_PATH_BS}"
+	[ -d "${_PATH_BS}" ] || _evalr mkdir -p "${_PATH_BS}"
+	_echot "------- ${file} ${_PATH_BS}"
+	sudo sh -c "echo '
+# bind ${_PATH_BS}
+${pth_shared_bs}				${_PATH_BS}	none	defaults,bind										0 0' >> ${file}"
+	_echot "------- daemon-reload"
+	_evalr systemctl daemon-reload
+	_echot "------- bind ${_PATH_BS}"
+	_evalr mount ${_PATH_BS}
+	[ -d ${_PATH_BS} ] || _exite "Unable to mount path: '${_PATH_BS}'"
+fi
+
+_echot "------- reduce swappiness"
+_evalr swapoff -av
+sudo sh -c 'echo vm.swappiness=20 > /etc/sysctl.d/99-swappiness.conf' # limit swap
+_evalr swapon -v
+
+########################  USER
+
+_echot "------- .sh_env"
+file=${HOME}/.sh_env
+_keepmvts ${file}
+_eval ln -s ${file_env} ${file}
+
+_echot "------- .sh_aliases"
+file=~/.sh_aliases
+_keepmvts ${file}
+_eval ln -s ${file_sh_aliases} ${file}
+
+_echot "------- .sh_functions"
+file=~/.sh_functions
+_keepmvts ${file}
+_eval ln -s ${file_sh_functions} ${file}
+
+_echot "------- .sh_env_perso"
+file=${HOME}/.sh_env_perso
+_keepmvts ${file}
+_eval cp -a ${file_env_perso} ${file}
+
+for file in ~/.bashrc ~/.zshrc; do
+	_echot "------- ${file##*/} env_perso"
+	grep -q ".sh_env_perso" ${file} || echo "
+# sh_env_perso
+[ -f \${HOME}/.sh_env_perso ] && . \${HOME}/.sh_env_perso" >> ${file}
+done
+
+_echot "------- .zshrc"
+echo "
+########################  SET OPTIONS
+
+# split words in string with default delimiters ' '
+setopt shwordsplit
+# allows interactive comments in console
+setopt interactivecomments
+" >> ~/.zshrc
+
+_echot "------- user links"
+for file in .nanorc .tmux.conf .vimrc; do
+	pth=${HOME}/${file}
+	_keepmvts "${pth}"
+	_eval ln -s "${_PATH_BS}/conf/${file}" "${pth}"
+done
+
+_echot "------- gtk bookmarks"
+file=~/.config/gtk-3.0/bookmarks
+echo "file:///home
+file:///ext
+file:///home/shared/dev
+file:///home/shared/repo" >> ${file}

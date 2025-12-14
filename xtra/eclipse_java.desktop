@@ -1,0 +1,50 @@
+[Desktop Entry]
+Name=Eclipse Java
+GenericName=Eclipse Studio Java
+Comment=An IDE for applications developpments
+Keywords=development;IDE;
+Exec=/opt/eclipse_java/eclipse
+Terminal=false
+Type=Application
+Icon=/opt/eclipse_java/icon.xpm
+Categories=Application;GTK;Development;IDE;
+StartupNotify=true
+StartupWMClass=Eclipse
+Actions=EclipseClean;Separator;FirefoxDev;Gedit;Ghex;GitG;Meld;Smartgit;
+
+[Desktop Action EclipseClean]
+Name=Eclipse -clean
+Exec=/opt/eclipse_java/eclipse -clean
+
+[Desktop Action Separator]
+Name=−−−−−−−−−−
+Exec=
+
+[Desktop Action FirefoxDev]
+Name=Firefox developer edition
+Exec=/usr/lib/firefox-developer-edition/firefox %u
+
+[Desktop Action SublimeText]
+Name=Sublime Text
+Exec=sublime-text
+
+[Desktop Action SublimeMerge]
+Name=Sublime merge
+Exec=sublime-merge
+
+[Desktop Action Ghex]
+Name=Ghex
+Exec=ghex %F
+
+[Desktop Action GitG]
+Name=Gitg
+Exec=gitg --no-wd %U
+
+[Desktop Action SquirrelSql]
+Name=Squirrel Sql
+Exec=squirrel-sql
+
+[Desktop Action Meld]
+Name=Meld
+Exec=meld
+

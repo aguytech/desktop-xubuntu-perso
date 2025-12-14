@@ -1,0 +1,16 @@
+#!/bin/bash
+
+########################  REQUIRED
+
+file_mudita=${_path_base}/perso/xtra/Mudita24.desktop
+_require ${file_mudita}
+
+_echot "------- install"
+packages="mudita24"
+_install_pcks ${packages}
+
+_echot "------- configuration"
+_echoA "Please adjust volumes and routes and save profile after vaildation."
+_askno "Validate to continue"
+_eval mudita24 -p4
+
