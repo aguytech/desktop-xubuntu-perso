@@ -6,13 +6,13 @@
 pth=~/.local/share/applications
 [ -d "${pth}" ] || mkdir -p ${pth}
 
-_echot "------- nautilus"
-name=org.gnome.Nautilus
+_echot "------- xfce-settings-manager"
+name=xfce-settings-manager
 file=/usr/share/applications/${name}.desktop
 if [ -f ${file} ]; then
 	_eval cp --update=all ${file} ${pth}
 	if ! grep -q '\[Desktop Action Separator\]' ${pth}/${name}.desktop; then
-		menuadd="NautilusNode1;NautilusComputer;NautilusNetwork;Separator;Terminal;SshcDev;Sshc;SshcLxd"
+		menuadd="Separator;ManjaroSettings;XfceSettings;LightdmGtk;Qt6ct;DconfSet;PlankSet;Separator;PamacManager;TaskManager;Gparted;DiskUsage;"
 		grep -q '^Actions=' ${pth}/${name}.desktop \
 			&& sed -i "s|^\(Actions=.*\)$|\1${menuadd}|" ${pth}/${name}.desktop \
 			|| echo "Actions=${menuadd}" >> ${pth}/${name}.desktop
@@ -21,33 +21,86 @@ if [ -f ${file} ]; then
 Name=−−−−−−−−−−
 Exec=
 
-[Desktop Action NautilusNode1]
-Name=Nautilus node1
-Exec=nautilus --new-window sftp://root@node1/usr/local/bs
+[Desktop Action PamacManager]
+Name=Pamac Manager
+Exec=pamac-manager
 
-[Desktop Action NautilusComputer]
-Name=Nautilus Computer
-Exec=nautilus --new-window computer:///
+[Desktop Action XfceSettings]
+Name=xfce4 settings
+Exec=xfce4-settings-editor
 
-[Desktop Action NautilusNetwork]
-Name=Nautilus Network
-Exec=nautilus --new-window network:///
+[Desktop Action TaskManager]
+Name=Task manager
+Exec=xfce4-taskmanager
+
+[Desktop Action LightdmGtk]
+Name=lightdm Gtk greeter settings
+Exec=lightdm-gtk-greeter-settings-pkexec
+
+[Desktop Action Qt6ct]
+Name=QT6 settings
+Exec=qt6ct
+
+[Desktop Action DiskUsage]
+Name=Disk Usage
+Exec=baobab
+
+[Desktop Action Gparted]
+Name=Gparted
+Exec=gksudo gparted
+
+[Desktop Action DconfSet]
+Name=Dconf settings
+Exec=dconf-editor
+
+[Desktop Action ManjaroSettings]
+Name=Manjaro settings
+Exec=manjaro-settings-manager
+" >> ${pth}/${name}.desktop
+	fi
+else
+	_echoe "${name} are skipped"
+	_echoe "${file} file not found"
+fi
+
+_echot "------- thunar"
+name=thunar
+file=/usr/share/applications/${name}.desktop
+if [ -f ${file} ]; then
+	_eval cp --update=all ${file} ${pth}
+	if ! grep -q '\[Desktop Action Separator\]' ${pth}/${name}.desktop; then
+		menuadd="ThunarNode1;Separator;Terminal;SshDev;SshS;SshNode1;SshLxd;"
+		grep -q '^Actions=' ${pth}/${name}.desktop \
+			&& sed -i "s|^\(Actions=.*\)$|\1${menuadd}|" ${pth}/${name}.desktop \
+			|| echo "Actions=${menuadd}" >> ${pth}/${name}.desktop
+		echo "
+[Desktop Action Separator]
+Name=−−−−−−−−−−
+Exec=
+
+[Desktop Action ThunarNode1]
+Name=Thunar node1
+Exec=thunar_newtabs /usr/local/bs sftp://root@node1/
 
 [Desktop Action Terminal]
 Name=Terminal
-Exec=gnome-terminal
+Exec=xfce4-terminal
 
-[Desktop Action SshcDev]
-Name=sshc dev
-Exec=gnome-terminal --tab --tab-with-profile node1
+[Desktop Action SshDev]
+Name=ssh dev
+Exec=xfce4-terminal --tab --tab --title=node1 -x ssh-server node1
 
-[Desktop Action Sshc]
-Name=sshc
-Exec=gnome-terminal -e ssh-server
+[Desktop Action SshS]
+Name=ssh server
+Exec=xfce4-terminal --title=server -x ssh-server
 
-[Desktop Action SshcLxd]
-Name=sshca
-Exec=gnome-terminal -e /home/shared/repo/bs/ssh-lxd
+[Desktop Action SshNode1]
+Name=ssh node1
+Exec=xfce4-terminal --tab --title=node1 -x ssh-server node1
+
+[Desktop Action SshLxd]
+Name=ssh LXD
+Exec=xfce4-terminal --tab --title=LXD -x ssh-lxd
 " >> ${pth}/${name}.desktop
 	fi
 else
@@ -55,44 +108,44 @@ else
 	_echoe "${file} file not found"
 fi
 
-_echot "------- org.gnome.Terminal"
-name=org.gnome.Terminal
+_echot "------- mousepad"
+name=org.xfce.mousepad
 file=/usr/share/applications/${name}.desktop
 if [ -f ${file} ]; then
 	_eval cp --update=all ${file} ${pth}
 	if ! grep -q '\[Desktop Action Separator\]' ${pth}/${name}.desktop; then
-		menuadd=";Separator;SshcDev;Sshc;SshcLxd;Separator;Nautilus;NautilusComputer;NautilusNetwork;"
-			grep -q '^Actions=' ${pth}/${name}.desktop \
-				&& sed -i "s|^\(Actions=.*\)$|\1${menuadd}|" ${pth}/${name}.desktop \
-				|| echo "Actions=${menuadd}" >> ${pth}/${name}.desktop
+		menuadd="Meld;GHex;Separator;Terminal;SshDev;SshS;SshNode1;SshLxd;"
+		grep -q '^Actions=' ${pth}/${name}.desktop \
+			&& sed -i "s|^\(Actions=.*\)$|\1${menuadd}|" ${pth}/${name}.desktop \
+			|| echo "Actions=${menuadd}" >> ${pth}/${name}.desktop
 		echo "
 [Desktop Action Separator]
 Name=−−−−−−−−−−
 Exec=
 
-[Desktop Action Sshc]
-Name=sshc
-Exec=gnome-terminal -e ssh-server
+[Desktop Action Meld]
+Name=Meld
+Exec=meld
 
-[Desktop Action SshcDev]
-Name=sshc dev
-Exec=gnome-terminal --tab --tab-with-profile node1
+[Desktop Action Terminal]
+Name=Terminal
+Exec=xfce4-terminal
 
-[Desktop Action SshcLxd]
-Name=sshca
-Exec=gnome-terminal -e /home/shared/repo/bs/ssh-lxd
+[Desktop Action SshDev]
+Name=ssh dev
+Exec=xfce4-terminal --tab --tab --title=node1 -x ssh-server node1
 
-[Desktop Action Nautilus]
-Name=Nautilus
-Exec=nautilus --new-window
+[Desktop Action SshS]
+Name=ssh server
+Exec=xfce4-terminal --title=server -x ssh-server
 
-[Desktop Action NautilusComputer]
-Name=Nautilus Computer
-Exec=nautilus --new-window computer:///
+[Desktop Action SshNode1]
+Name=ssh node1
+Exec=xfce4-terminal --tab --title=node1 -x ssh-server node1
 
-[Desktop Action NautilusNetwork]
-Name=Nautilus Network
-Exec=nautilus --new-window network:///
+[Desktop Action SshLxd]
+Name=ssh lxd
+Exec=xfce4-terminal --tab --title=LXD -x ssh-server ssh-lxd
 " >> ${pth}/${name}.desktop
 	fi
 else
@@ -100,42 +153,44 @@ else
 	_echoe "${file} file not found"
 fi
 
-_echot "------- org.gnome.Totem"
-name=org.gnome.Totem
+_echot "------- xfce4-terminal"
+name=xfce4-terminal
 file=/usr/share/applications/${name}.desktop
 if [ -f ${file} ]; then
 	_eval cp --update=all ${file} ${pth}
 	if ! grep -q '\[Desktop Action Separator\]' ${pth}/${name}.desktop; then
-		menuadd="Separator;HandBrake;Brasero;MKVtoolnix;GnomeSubtitles;KDEnlive;Separator;Mpv;"
-		sed -i "s/^\(Actions=.*\)$/\1${menuadd}/" ${pth}/${name}.desktop
+		menuadd="Separator;SshDev;SshS;SshNode1;SshLxd;Separator;Thunar;ThunarNode1;"
+		grep -q '^Actions=' ${pth}/${name}.desktop \
+			&& sed -i "s|^\(Actions=.*\)$|\1${menuadd}|" ${pth}/${name}.desktop \
+			|| echo "Actions=${menuadd}" >> ${pth}/${name}.desktop
 		echo "
 [Desktop Action Separator]
 Name=−−−−−−−−−−
 Exec=
 
-[Desktop Action Brasero]
-Name=Brasero
-Exec=brasero
+[Desktop Action SshDev]
+Name=ssh dev
+Exec=xfce4-terminal --tab --tab --title=node1 -x ssh-server node1
 
-[Desktop Action MKVtoolnix]
-Name=MKVtoolnix GUI
-Exec=mkvtoolnix-gui
+[Desktop Action SshS]
+Name=ssh server
+Exec=xfce4-terminal --title=server -x ssh-server
 
-[Desktop Action GnomeSubtitles]
-Name=Gnome Subtitles
-Exec=gnome-subtitles
+[Desktop Action SshNode1]
+Name=ssh node1
+Exec=xfce4-terminal --tab --title=node1 -x ssh-server node1
 
-[Desktop Action KDEnlive]
-Name=KDEnlive Video Editor
-Exec=kdenlive
+[Desktop Action SshLxd]
+Name=ssh lxd
+Exec=xfce4-terminal --tab --title=LXD -x ssh-server ssh-lxd
 
-[Desktop Action HandBrake]
-Name=HandBrake
-Exec=ghb
+[Desktop Action Thunar]
+Name=Thunar
+Exec=thunar
 
-[Desktop Action Mpv]
-Name=Mpv media player
-Exec=mpv --player-operation-mode=pseudo-gui
+[Desktop Action ThunarNode1]
+Name=Thunar node1
+Exec=thunar_newtabs /usr/local/bs sftp://root@node1/
 " >> ${pth}/${name}.desktop
 	fi
 else
@@ -149,78 +204,30 @@ file=/usr/share/applications/${name}.desktop
 if [ -f ${file} ]; then
 	_eval cp --update=all ${file} ${pth}
 	if ! grep -q '\[Desktop Action Separator\]' ${pth}/${name}.desktop; then
-		echo "Actions=Separator;HandBrake;Brasero;MKVtoolnix;GnomeSubtitles;KDEnlive;Separator;Totem;
-
-[Desktop Action Separator]
-Name=−−−−−−−−−−
-Exec=
-
-[Desktop Action Brasero]
-Name=Brasero
-Exec=brasero
-
-[Desktop Action MKVtoolnix]
-Name=MKVtoolnix GUI
-Exec=mkvtoolnix-gui
-
-[Desktop Action GnomeSubtitles]
-Name=Gnome Subtitles
-Exec=gnome-subtitles
-
-[Desktop Action KDEnlive]
-Name=KDEnlive Video Editor
-Exec=kdenlive
-
-[Desktop Action HandBrake]
-Name=HandBrake
-Exec=ghb
-
-[Desktop Action Totem]
-Name=Totem media player
-Exec=totem
-" >> ${pth}/${name}.desktop
-	fi
-else
-	_echoe "${name} are skipped"
-	_echoe "${file} file not found"
-fi
-
-_echot "------- gmusicbrowser"
-name=gmusicbrowser
-file=/usr/share/applications/${name}.desktop
-if [ -f ${file} ]; then
-	_eval cp --update=all ${file} ${pth}
-	if ! grep -q '\[Desktop Action Separator\]' ${pth}/${name}.desktop; then
-		menuadd="Separator;Lollypop;PulseaudioEqualizer;Separator;Audacity;Easytag;SoundJuicer;SoundConverter;"
-		sed -i "s/^\(Actions=.*\)$/\1${menuadd}/" ${pth}/${name}.desktop
+		menuadd="Separator;Celluloid;HandBrake;SubtitleEditor;MKVtoolnix;"
+		grep -q '^Actions=' ${pth}/${name}.desktop \
+			&& sed -i "s|^\(Actions=.*\)$|\1${menuadd}|" ${pth}/${name}.desktop \
+			|| echo "Actions=${menuadd}" >> ${pth}/${name}.desktop
 		echo "
 [Desktop Action Separator]
 Name=−−−−−−−−−−
 Exec=
 
-[Desktop Action Audacity]
-Name=Audacity
-Exec=audacity
+[Desktop Action Celluloid]
+Name=Celluloid
+Exec=celluloid
 
-[Desktop Action Easytag]
-Name=Easytag
-Exec=easytag %F
+[Desktop Action MKVtoolnix]
+Name=MKVtoolnix GUI
+Exec=mkvtoolnix-gui
 
-[Desktop Action Mixxx]
-Name=Mixxx
-Exec=mixxx
+[Desktop Action SubtitleEditor]
+Name=Subtitle editor
+Exec=subtitleeditor
 
-[Desktop Action SoundJuicer]
-Name=SoundJuicer
-Exec=sound-juicer
-
-[Desktop Action SoundConverter]
-Name=Sound Converter
-Exec=soundconverter %U
-
-[Desktop Action PulseaudioEqualizer]
-Name=Pulseaudio Equalizer
-Exec=qpaeq
+[Desktop Action HandBrake]
+Name=HandBrake
+Exec=ghb
 " >> ${pth}/${name}.desktop
 	fi
 else
@@ -234,8 +241,11 @@ file=/usr/share/applications/${name}.desktop
 if [ -f ${file} ]; then
 	_eval cp --update=all ${file} ${pth}
 	if ! grep -q '\[Desktop Action Separator\]' ${pth}/${name}.desktop; then
-		echo "Actions=gThumb;Inkscape;Separator;SimpleScan;XSane;
-
+		menuadd="gThumb;Inkscape;Separator;XSane;"
+		grep -q '^Actions=' ${pth}/${name}.desktop \
+			&& sed -i "s|^\(Actions=.*\)$|\1${menuadd}|" ${pth}/${name}.desktop \
+			|| echo "Actions=${menuadd}" >> ${pth}/${name}.desktop
+		echo "
 [Desktop Action Separator]
 Name=−−−−−−−−−−
 Exec=
@@ -248,12 +258,8 @@ Exec=gthumb %U
 Name=Inkscape
 Exec=inkscape %F
 
-[Desktop Action SimpleScan]
-Name=Simple Scan
-Exec=simple-scan
-
 [Desktop Action XSane]
-Name=XSane Image scanning program
+Name=XSane
 Exec=xsane
 " >> ${pth}/${name}.desktop
 	fi
@@ -268,74 +274,38 @@ file=/usr/share/applications/${name}.desktop
 if [ -f ${file} ]; then
 	_eval cp --update=all ${file} ${pth}
 	if ! grep -q '\[Desktop Action Separator\]' ${pth}/${name}.desktop; then
-		menuadd="Separator;Gcolor3;Calculator;Stopwatch;Activity;"
-		sed -i "s/^\(Actions=.*\)$/\1${menuadd}/" ${pth}/${name}.desktop
+		menuadd="Separator;Archimate;Zotero;Galculator;QpdfView;Gcolor3;FontViewer;XfBurn;Brasero;"
+		grep -q '^Actions=' ${pth}/${name}.desktop \
+			&& sed -i "s|^\(Actions=.*\)$|\1${menuadd}|" ${pth}/${name}.desktop \
+			|| echo "Actions=${menuadd}" >> ${pth}/${name}.desktop
 		echo "
 [Desktop Action Separator]
 Name=−−−−−−−−−−
 Exec=
 
-[Desktop Action Activity]
-Name=Activity journal
-Exec=gnome-activity-journal
+[Desktop Action Archimate]
+Name=Archimate
+Exec=archi
 
-[Desktop Action Calculator]
-Name=Calculator
-Exec=gnome-calculator
+[Desktop Action Zotero]
+Name=Zotero
+Exec=zotero
 
-[Desktop Action Stopwatch]
-Name=Stopwatch
-Exec=/usr/bin/stopwatch
+[Desktop Action QpdfView]
+Name=QpdfView
+Exec=qpdfview
+
+[Desktop Action Galculator]
+Name=Galculator
+Exec=galculator
 
 [Desktop Action Gcolor3]
 Name=Color Picker
 Exec=gcolor3
-" >> ${pth}/${name}.desktop
-	fi
-else
-	_echoe "${name} are skipped"
-	_echoe "${file} file not found"
-fi
 
-_echot "------- gnome-tweak-tool"
-name=org.gnome.tweaks
-file=/usr/share/applications/${name}.desktop
-if [ -f ${file} ]; then
-	_eval cp --update=all ${file} ${pth}
-	if ! grep -q '\[Desktop Action Separator\]' ${pth}/${name}.desktop; then
-		echo "Actions=Separator;SoftwareUpdates;SoftwareSources;Separator;Gparted;DiskUtility;DiskUsage;Sysinfo;Separator;
-
-[Desktop Action Separator]
-Name=−−−−−−−−−−
-Exec=
-
-[Desktop Action SoftwareUpdates]
-Name=Update Manager
-Exec=update-manager
-
-[Desktop Action Synaptic]
-Name=Synaptic
-Exec=synaptic
-
-[Desktop Action SoftwareSources]
-Name=Software Sources
-Exec=software-properties-gtk
-
-[Desktop Action DiskUsage]
-Name=Disk Usage
-Exec=baobab
-
-[Desktop Action DiskUtility]
-Name=Disk Utility
-Exec=gnome-disks
-
-[Desktop Action Gparted]
-Name=Gparted
-Exec=gksudo gparted
-
-[Desktop Action Sysinfo]
-Name=Sysinfo
-Exec=sysinfo
+[Desktop Action FontViewer]
+Name=Font viewer
+Exec=gtk2fontsel
 " >> ${pth}/${name}.desktop
 	fi
 else

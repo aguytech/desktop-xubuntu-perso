@@ -1,20 +1,15 @@
 #!/bin/bash
 
-########################  REQUIRED
-
-_echot "------- required paths"
-pth_conf=${_path_base}/perso/conf
-_requirep ${pth_conf}
+# monitor channel
+#xfconf-query -c xfce4-panel -m -v
+# xfce settings GUI
+#xfce4-settings-editor
 
 ########################  DATA
 
 anstmp=8
 _askno "Give the size for global desktop font (${anstmp})"
 font_size=${_ANSWER:-${anstmp}}
-
-let anstmp=${font_size}+1
-_askno "Give the size for global desktop font (${anstmp})"
-font_interface_size=${_ANSWER:-${anstmp}}
 
 anstmp=3600
 _askno "Give the screensaver lock-delay inseconds (${anstmp})"
@@ -32,68 +27,38 @@ _gnome_settings() {
 
 _echot "------- gsettings desktop"
 pth=org.gnome.desktop.interface
-options="font-name 'Ubuntu Sans ${font_interface_size}'
-document-font-name 'Sans ${font_size}'
-monospace-font-name 'Monospace ${font_size}'
-clock-format '24h'
-clock-show-weekday true"
+options="font-name 'Noto Sans ${font_size}'
+document-font-name 'Adwaita Sans ${font_size}'
+monospace-font-name 'Adwaita Mono ${font_size}'
+gtk-color-scheme ''
+gtk-theme 'Adwaita-dark'
+icon-theme 'Papirus-Dark'
+gtk-timeout-initial 300
+gtk-timeout-repeat 50
+clock-format '24h'"
 _gnome_settings ${pth} "${options}"
 
 ########################  KEYBOARD
 
-_echot "------- gsettings org.gnome.desktop.peripherals.keyboard"
+_echot "------- gsettings desktop.peripherals.keyboard"
 pth=org.gnome.desktop.peripherals.keyboard
 options="delay 'uint32 300'
 numlock-state true
-repeat-interval 'uint32 50'"
+repeat-interval 'uint32 50'
+remember-numlock-state true"
 _gnome_settings ${pth} "${options}"
 
+_echot "------- gsettings desktop.*"
+# palette
+_eval "gsettings set org.gnome.desktop.interface gtk-color-palette 'black:white:gray50:red:purple:blue:light blue:green:yellow:orange:lavender:brown:goldenrod4:dodger blue:pink:light green:gray10:gray30:gray75:gray90'"
 # screensaver
 _eval "gsettings set org.gnome.desktop.screensaver lock-delay 'uint32 ${screen_lock_delay}'"
 # sound
 _eval "gsettings set org.gnome.desktop.sound event-sounds false"
-
-########################  TERMINAL
-
-_echot "------- dconf gnome-terminal"
-_menu "Select the gnome-terminal profiles file to import" none $(cd ${pth_conf} && ls gnome-terminal-profiles*)
-[ ${_ANSWER} != none ] && _eval "dconf load /org/gnome/terminal/legacy/profiles:/ < ${pth_conf}/${_ANSWER}"
-# dconf dump /org/gnome/terminal/legacy/profiles:/ > ${pth_conf}/${_ANSWER}
-# gsettings get org.gnome.Terminal.ProfilesList list
-# gsettings get org.gnome.Terminal.ProfilesList default
-
-########################  DOCK
-
-_echot "------- gsettings dock"
-pth=org.gnome.shell.extensions.dash-to-dock
-options="always-center-icons true
-background-opacity 0
-dock-fixed false
-dock-position 'BOTTOM'
-scroll-action 'cycle-windows'
-show-show-apps-button false
-show-trash false
-transparency-mode 'FIXED'"
-_gnome_settings ${pth} "${options}"
-
-########################  NAUTILUS
-
-_echot "------- gsettings nautilus"
-pth=org.gnome.nautilus.preferences
-options="default-folder-viewer 'list-view'
-show-create-link true
-show-delete-permanently true
-show-hidden-files true"
-_gnome_settings ${pth} "${options}"
-
-pth=org.gnome.nautilus.list-view
-options="default-zoom-level 'small'
-use-tree-view true"
-_gnome_settings ${pth} "${options}"
-
-pth=org.gnome.nautilus.compression
-options="default-compression-format 'tar.xz'"
-_gnome_settings ${pth} "${options}"
+# num-lock
+_eval "gsettings set org.gnome.desktop.peripherals.keyboard remember-numlock-state true"
+# calendar
+_eval "gsettings set org.gnome.desktop.calendar show-weekdate false"
 
 ########################  MELD
 
@@ -114,7 +79,7 @@ _gnome_settings ${pth} "${options}"
 _echot "------- gsettings vim"
 pth=org.gnome.desktop.wm.preferences
 options="audible-bell false
-titlebar-font 'Ubuntu Sans Bold 10'
+titlebar-font 'Adwaita Sans Bold 10'
 visual-bell false"
 _gnome_settings ${pth} "${options}"
 
@@ -126,7 +91,90 @@ options="expand-folders true
 show-hidden true"
 _gnome_settings ${pth} "${options}"
 
-########################  MUTTER
+######################################################### XCONF-QUERY
 
-_echot "------- gsettings others"
-_eval "gsettings set org.gnome.mutter center-new-windows true"
+_xconf_settings() {
+	while read -r key value type; do
+		if xfconf-query -c $1 -p ${key} -v 2>/dev/null; then
+			_eval "xfconf-query --channel $1 --property ${key} --set ${value//£/ }"
+		else
+			_eval "xfconf-query --channel $1 --property ${key} --create --type ${type} --set ${value//£/ }"
+		fi
+	done <<< "$2"
+}
+
+########################  XSETTINGS
+
+channel=xsettings
+_echot "------- xfconf-query ${channel}"
+options="/Gtk/CursorThemeSize 16 int
+/Gtk/FontName 'Noto£Sans£${font_size}' string
+/Gtk/MonospaceFontName  'Monospace£${font_size}' string"
+_xconf_settings ${channel} "${options}"
+
+########################  SCREENSAVER
+
+channel=xfce4-screensaver
+_echot "------- xfconf-query ${channel}"
+options="/saver/idle-activation/delay 15 int"
+_xconf_settings ${channel} "${options}"
+
+########################  KEYBOARDS
+
+channel=keyboards
+_echot "------- xfconf-query ${channel}"
+options="/Default/KeyRepeat/Delay 300 int
+/Default/Numlock true bool
+/Default/KeyRepeat/Rate 50 int"
+_xconf_settings ${channel} "${options}"
+
+########################  XFCE4-TERMINAL
+
+channel=xfce4-terminal
+_echot "------- xfconf-query ${channel}"
+options="/background-mode 'TERMINAL_BACKGROUND_SOLID' string
+/background-darkness 0.8 double
+/color-background '#258b21861ec9' string
+/color-foreground '#f6f6f5f5f4f4' string
+/color-cursor-use-default false bool
+/color-cursor '#ffff78780000' string
+/color-palette 'rgb(105,103,102);rgb(237,51,59);rgb(80,225,80);rgb(248,228,92);rgb(98,160,234);rgb(220,138,221);rgb(77,218,218);rgb(246,245,244);rgb(139,137,136);rgb(255,85,85);rgb(85,255,85);rgb(255,255,85);rgb(53,132,228);rgb(220,138,221);rgb(85,255,255);rgb(255,255,255)' string
+/color-selection-use-default false bool
+/color-selection-background '#c6c646460000' string
+/font-use-system true bool
+/misc-bell-urgent true bool
+/misc-copy-on-select true bool
+/misc-default-geometry '120x24' string
+/misc-middle-click-opens-uri true bool
+/misc-new-tab-adjacent true bool
+/misc-show-unsafe-paste-dialog false bool
+/misc-slim-tabs true bool
+/background-mode 'TERMINAL_BACKGROUND_TRANSPARENT' string"
+_xconf_settings ${channel} "${options}"
+
+########################  THUNAR
+
+channel=thunar
+_echot "------- xfconf-query ${channel}"
+pid=$(ps -C Thunar -o pid=)
+[ "${pid}" ] && _echot "------- close thunar" && _evalr kill ${pid}
+
+options="/last-location-bar 'ThunarLocationButtons' string
+/last-show-hidden true bool
+/last-view 'ThunarDetailsView' string
+/last-view 'ThunarDetailsView' string
+/misc-date-style 'THUNAR_DATE_STYLE_SHORT' string
+/misc-directory-specific-settings true bool
+/misc-show-delete-action true bool"
+_xconf_settings ${channel} "${options}"
+
+########################  SHORTCUTS
+
+channel=xfce4-keyboard-shortcuts
+_echot "------- xfconf-query ${channel}"
+options="'/commands/custom/<Primary><Alt>t' 'xfce4-terminal£-e£\"tmux£a\"' string
+'/commands/custom/<Primary><Shift><Alt>t' 'xfce4-terminal' string
+'/commands/custom/<Primary><Alt>d' 'xfce4-terminal£--drop-down' string
+'/commands/custom/<Primary><Alt>g' 'galculator' string
+'/commands/custom/Super_L' 'xfce4-popup-whiskermenu' string"
+_xconf_settings ${channel} "${options}"
