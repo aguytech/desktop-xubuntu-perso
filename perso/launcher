@@ -108,51 +108,6 @@ else
 	_echoe "${file} file not found"
 fi
 
-_echot "------- mousepad"
-name=org.xfce.mousepad
-file=/usr/share/applications/${name}.desktop
-if [ -f ${file} ]; then
-	_eval cp --update=all ${file} ${pth}
-	if ! grep -q '\[Desktop Action Separator\]' ${pth}/${name}.desktop; then
-		menuadd="Meld;GHex;Separator;Terminal;SshDev;SshS;SshNode1;SshLxd;"
-		grep -q '^Actions=' ${pth}/${name}.desktop \
-			&& sed -i "s|^\(Actions=.*\)$|\1${menuadd}|" ${pth}/${name}.desktop \
-			|| echo "Actions=${menuadd}" >> ${pth}/${name}.desktop
-		echo "
-[Desktop Action Separator]
-Name=−−−−−−−−−−
-Exec=
-
-[Desktop Action Meld]
-Name=Meld
-Exec=meld
-
-[Desktop Action Terminal]
-Name=Terminal
-Exec=xfce4-terminal
-
-[Desktop Action SshDev]
-Name=ssh dev
-Exec=xfce4-terminal --tab --tab --title=node1 -x ssh-server node1
-
-[Desktop Action SshS]
-Name=ssh server
-Exec=xfce4-terminal --title=server -x ssh-server
-
-[Desktop Action SshNode1]
-Name=ssh node1
-Exec=xfce4-terminal --tab --title=node1 -x ssh-server node1
-
-[Desktop Action SshLxd]
-Name=ssh lxd
-Exec=xfce4-terminal --tab --title=LXD -x ssh-server ssh-lxd
-" >> ${pth}/${name}.desktop
-	fi
-else
-	_echoe "${name} are skipped"
-	_echoe "${file} file not found"
-fi
-
 _echot "------- xfce4-terminal"
 name=xfce4-terminal
 file=/usr/share/applications/${name}.desktop
