@@ -168,7 +168,19 @@ options="/last-location-bar 'ThunarLocationButtons' string
 /misc-show-delete-action true bool"
 _xconf_settings ${channel} "${options}"
 
+########################  VOLMAN
+
+channel=thunar-volman
+_echot "------- thunar-volman"
+options="/autobrowse/enabled false bool
+/automount-drives/enabled false bool
+/automount-media/enabled false bool"
+_xconf_settings ${channel} "${options}"
+
 ########################  SHORTCUTS
+
+# remove 'super L' conflict
+xfconf-query -c xfce4-keyboard-shortcuts -p '/commands/custom/<Alt>F1' -r
 
 channel=xfce4-keyboard-shortcuts
 _echot "------- xfconf-query ${channel}"
