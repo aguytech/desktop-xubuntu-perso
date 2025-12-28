@@ -6,7 +6,7 @@ S_TRACE=debug
 _PATH_BASE=$( readlink -f ${0%/*} )
 _PATH_CONF=/usr/local/conf
 _PATH_LOG=/var/log/desktop-install
-_VER_NAME=debian
+_VER_NAME=xubuntu
 _path_base=$( readlink -f ${0%/*}/../ )
 
 # inc
