@@ -38,10 +38,29 @@ done
 
 [ "${nopart}" ] && _exite "Please restart due to some errors"
 
+########################  REMOVE
+
+_echot "------- firefox remove snap"
+_evalr snap remove --purge firefox
+
+_echot "------- firefox remove"
+_evalr apt remove -y --purge firefox*
+
 ########################  FIREFOX
 
+_echot "------- block snap"
+echo 'Package: *
+Pin: release o=LP-PPA-mozillateam
+Pin-Priority: 1000' | sudo tee /etc/apt/preferences.d/mozillateam
+
+_echot "------- firefox add ppa"
+_evalr add-apt-repository -yn ppa:mozillateam/ppa
+
+_echot "------- apt update"
+_evalr apt update
+
 _echot "------- firefox install"
-_install_pcks firefox-esr
+_install_pcks firefox
 
 _echot "------- firefox profile"
 _echoA "Choose the right path to create a profile & close application"
@@ -56,7 +75,7 @@ _eval ln -s "${_PATH_BS}/conf/user.js" ${pth}/user.js
 _evalr chown ${USER}:${USER} ${pth}
 
 _echot "------- firefox launcher"
-name=firefox-esr
+name=firefox
 file=/usr/share/applications/${name}.desktop
 pth=~/.local/share/applications
 if [ -f ${file} ]; then
@@ -119,6 +138,9 @@ fi
 
 _echot "------- thunderbird install"
 _evalr apt  install -y thunderbird
+
+_echot "------- thunderbird launcher"
+sed -i "/^StartupWMClass=/ s|=.*$|=org.mozilla.Thunderbird|" ~/.local/share/applications/org.mozilla.Thunderbird.desktop
 
 _echot "------- thunderbird profile"
 _echoA "Choose the right path to create a profile & close application"
