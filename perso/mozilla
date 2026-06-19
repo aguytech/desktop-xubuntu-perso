@@ -139,9 +139,6 @@ fi
 _echot "------- thunderbird install"
 _evalr apt  install -y thunderbird
 
-_echot "------- thunderbird launcher"
-sed -i "/^StartupWMClass=/ s|=.*$|=org.mozilla.Thunderbird|" ~/.local/share/applications/org.mozilla.Thunderbird.desktop
-
 _echot "------- thunderbird profile"
 _echoA "Choose the right path to create a profile & close application"
 _askno "Validate to continue"
@@ -182,3 +179,6 @@ else
 	_echoe "${name} are skipped"
 	_echoe "${file} file not found"
 fi
+
+_echot "------- thunderbird launcher StartupWMClass"
+sed -i "/^StartupWMClass=/ s|=.*$|=org.mozilla.Thunderbird|" ~/.local/share/applications/org.mozilla.Thunderbird.desktop
