@@ -42,7 +42,7 @@ ${pth_shared_bs}				${S_PATH_SCRIPT}	none	defaults,bind										0 0' >> ${file}
 	_evalr mount ${S_PATH_SCRIPT}
 	[ -d ${S_PATH_SCRIPT} ] || _exite "Unable to mount path: '${S_PATH_SCRIPT}'"
 else
-	_echoE "------- binding ${S_PATH_SCRIPT} to ${pth_shared_bs} is skipping"	
+	_echoE "------- binding ${S_PATH_SCRIPT} to ${pth_shared_bs} is skipping"
 fi
 
 _echot "------- reduce swappiness"
