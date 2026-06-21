@@ -151,7 +151,7 @@ pth=~/.local/share/applications
 if [ -f ${file} ]; then
 	_eval cp --update=all ${file} ${pth}
 	if ! grep -q '\[Desktop Action Separator\]' ${pth}/${name}.desktop; then
-		menuadd="Separator;Addressbook;ProfileManager;ProfileExtend;"
+		menuadd=";Separator;Addressbook;ProfileManager;ProfileExtend;"
 		sed -i "s/^\(Actions=.*\)$/\1${menuadd}/" ${pth}/${name}.desktop
 		echo "
 [Desktop Action Separator]
@@ -169,10 +169,6 @@ Exec=thunderbird --ProfileManager
 [Desktop Action ProfileExtend]
 Name=Profile  Extend
 Exec=thunderbird -P extend
-
-[Desktop Action Compose]
-Name=Compose
-Exec=thunderbird -compose
 " >> ${pth}/${name}.desktop
 	fi
 else
