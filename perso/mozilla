@@ -179,6 +179,3 @@ else
 	_echoe "${name} are skipped"
 	_echoe "${file} file not found"
 fi
-
-_echot "------- thunderbird launcher StartupWMClass"
-sed -i "/^StartupWMClass=/ s|=.*$|=org.mozilla.Thunderbird|" ~/.local/share/applications/org.mozilla.Thunderbird.desktop
